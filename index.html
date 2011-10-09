@@ -1,0 +1,622 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="author" content="Gordon Mei" />
+        <title>Bouncer</title>
+        <style type="text/css">
+            /* Mini Reset */
+            * {
+                margin: 0;
+                padding: 0;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            }
+
+
+            /* General Elements */
+            header,
+            section,
+            aside {
+                display: block;
+            }
+
+            fieldset {
+                border: 0;
+            }
+
+            label {
+                cursor: pointer;
+            }
+
+            input::-webkit-input-placeholder,
+            textarea::-webkit-input-placeholder {
+                color: #ccc;
+            }
+
+            input:-moz-placeholder,
+            textarea:-moz-placeholder {
+                color: #ccc;
+            }
+
+
+            /* Calls to Action */
+            button {
+                display: inline-block;
+                padding: 8px 30px;
+                border-style: solid;
+                border-width: 1px;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                color: #ddd;
+                cursor: pointer;
+                font-weight: 500;
+                text-shadow: 0 -1px 0 #000;
+                -moz-transition: color 0.5s linear 0s;
+                -webkit-transition: color 0.5s linear 0s;
+                transition: color 0.5s linear 0s;
+                outline: 0;
+            }
+
+            button.active {
+                background-color: #333;
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#aaaaaa', EndColorStr='#000000');
+                background-image: -moz-linear-gradient(center top, #525252 0pt, #323232 50%, #2e2e2e 50%, #111 100%);
+                background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #525252), color-stop(0.5, #323232), color-stop(0.5, #2e2e2e), color-stop(1.0, #111));
+                background-image: -webkit-linear-gradient(center top, #525252 0pt, #323232 50%, #2e2e2e 50%, #111 100%);
+                background-image: -o-linear-gradient(#525252 0pt, #323232 50%, #2e2e2e 50%, #111 100%);
+                background-image: linear-gradient(center top, #525252 0pt, #323232 50%, #2e2e2e 50%, #111 100%);
+                border-color: #222 #111 #000 #111;
+                -moz-box-shadow: 0 1px 0 #292929, 0 1px 0 #8e8e8e inset, 0 -1px 0 #333 inset, 1px 0 0 #515151 inset, -1px 0 0 #575757 inset;
+                -webkit-box-shadow: 0 1px 0 #292929, 0 1px 0 #8e8e8e inset, 0 -1px 0 #333 inset, 1px 0 0 #515151 inset, -1px 0 0 #575757 inset;
+                box-shadow: 0 1px 0 #292929, 0 1px 0 #8e8e8e inset, 0 -1px 0 #333 inset, 1px 0 0 #515151 inset, -1px 0 0 #575757 inset;
+            }
+
+            button.active:hover {
+                background-color: #333;
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#aaaaaa', EndColorStr='#000000');
+                background-image: -moz-linear-gradient(center top, #626262 0pt, #424242 50%, #3e3e3e 50%, #222 100%);
+                background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #626262), color-stop(0.5, #424242), color-stop(0.5, #3e3e3e), color-stop(1.0, #222));
+                background-image: -webkit-linear-gradient(center top, #626262 0pt, #424242 50%, #3e3e3e 50%, #222 100%);
+                background-image: -o-linear-gradient(#626262 0pt, #424242 50%, #3e3e3e 50%, #222 100%);
+                background-image: linear-gradient(center top, #626262 0pt, #424242 50%, #3e3e3e 50%, #222 100%);
+                border-color: #222 #111 #000 #111;
+            }
+
+            button.active:active {
+                -moz-box-shadow: inset 0 0 10px #333, inset 1px 1px 3px #111, inset -1px -1px 15px #2a2a2a;
+                -webkit-box-shadow: inset 0 0 10px #333, inset 1px 1px 3px #111, inset -1px -1px 15px #2a2a2a;
+                box-shadow: inset 0 0 10px #333, inset 1px 1px 3px #111, inset -1px -1px 15px #2a2a2a;
+            }
+
+
+            /* Layout */
+            header,
+            section,
+            aside {
+                margin: 0 auto;
+                width: 30em;
+            }
+
+            header {
+                display: none; /* Not designed enough yet. Removing. */
+            }
+
+            header + section {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                margin-top: -12em;
+                margin-left: -15em;
+                min-height: 20em;
+                *height: 24em;
+                width: 30em;
+            }
+
+            header > hgroup > h1 {
+                font-size: 30pt;
+                font-weight: 400;
+                letter-spacing: -1px;
+            }
+
+            header > hgroup > h2 {
+                font-size: 18pt;
+                font-weight: 300;
+            }
+
+            section > form {
+                display: block;
+                background-color: #f7f7f7;
+                border: 1px solid #dfdfdf;
+                padding: 2em;
+                -moz-border-radius: 8px;
+                -webkit-border-radius: 8px;
+                border-radius: 8px;
+                -moz-box-shadow: inset 0 0 5px #ddd;
+                -webkit-box-shadow: inset 0 0 5px #ddd;
+                box-shadow: inset 0 0 5px #ddd;
+            }
+
+            section > form > fieldset > legend {
+                display: block;
+                padding-bottom: 1em;
+                font-size: 1.3em;
+                font-weight: 400;
+                letter-spacing: -1px;
+                color: #111;
+            }
+
+            section > form > fieldset > label {
+                display: block;
+                font-weight: 300;
+                line-height: 150%;
+            }
+
+            section > form > fieldset > label:after {
+                content: ":";
+                margin-left: -0.2em;
+            }
+
+            section > form > fieldset > input + label,
+            section > form > fieldset > textarea + label,
+            section > form > fieldset > input + button,
+            section > form > fieldset > textarea + button {
+                margin-top: 1em;
+            }
+
+            section > form > fieldset > input[type="text"],
+            section > form > fieldset > input[type="email"],
+            section > form > fieldset > input[type="password"],
+            section > form > fieldset > textarea {
+                display: block;
+                width: 20em;
+                font-weight: 300;
+            }
+
+            section > form > fieldset > button {
+                display: block;
+                font-weight: 600;
+                font-size: 14pt;
+            }
+
+            section > form > fieldset > input[type="text"],
+            section > form > fieldset > input[type="email"],
+            section > form > fieldset > input[type="password"],
+            section > form > fieldset > textarea {
+                padding: 8px;
+                border: solid 1px #ccc;
+                font-size: 14pt;
+                color: #111;
+                outline: none;
+                margin-bottom: 3px;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+                border-radius: 5px;
+                -moz-box-shadow: inset 0 0 5px #bbb;
+                -webkit-box-shadow: inset 0 0 5px #bbb;
+                box-shadow: inset 0 0 5px #bbb;
+                -moz-transition: all 0.3s;
+                -webkit-transition: all 0.3s;
+                transition: all 0.3s;
+            }
+
+            section > form > fieldset > input[type="text"]:focus,
+            section > form > fieldset > input[type="email"]:focus,
+            section > form > fieldset > input[type="password"]:focus,
+            section > form > fieldset > textarea:focus {
+                border: solid 1px #cc9966;
+                color: #000;
+                -moz-box-shadow: 0 0 4px #ffa655, inset 0 0 5px #aaa;
+                -webkit-box-shadow: 0 0 4px #ffa655, inset 0 0 5px #aaa;
+                box-shadow: 0 0 4px #ffa655, inset 0 0 5px #aaa;
+            }
+
+            section > form > fieldset > input[type="text"].warningmode,
+            section > form > fieldset > input[type="email"].warningmode,
+            section > form > fieldset > input[type="password"].warningmode,
+            section > form > fieldset > textarea:focus {
+                border: solid 1px #ff6f55;
+                color: #000;
+                -moz-box-shadow: 0 0 4px #ff6f55, inset 0 0 5px #bbb;
+                -webkit-box-shadow: 0 0 4px #ff6f55, inset 0 0 5px #bbb;
+                box-shadow: 0 0 4px #ff6f55, inset 0 0 5px #bbb;
+            }
+
+            section + aside {
+                margin-top: 0.8em;
+            }
+
+            aside > p {
+                text-align: center;
+                font-size: 10pt;
+                color: #999;
+                line-height: 150%;
+            }
+
+
+            /* I warned you about that. */
+            .inlinewarning {
+                color: #ff6f55;
+                font-size: 0.95em;
+                line-height: 150%;
+            }
+
+
+            /* Enhancements */
+            .diag_pinstripes {
+                margin: 10px;
+                background-color: #f8f8fa;
+                background-image: -webkit-gradient(linear, 0 0, 100% 100%,
+                                        color-stop(.25, rgba(255, 255, 255, 1.0)), color-stop(.25, transparent),
+                                        color-stop(.5, transparent), color-stop(.5, rgba(255, 255, 255, 1.0)),
+                                        color-stop(.75, rgba(255, 255, 255, 1.0)), color-stop(.75, transparent),
+                                         to(transparent));
+                background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 1.0) 25%, transparent 25%,
+                                    transparent 50%, rgba(255, 255, 255, 1.0) 50%, rgba(255, 255, 255, 1.0) 75%,
+                                    transparent 75%, transparent);
+                background-image: -moz-linear-gradient(45deg, rgba(255, 255, 255, 1.0) 25%, transparent 25%,
+                                    transparent 50%, rgba(255, 255, 255, 1.0) 50%, rgba(255, 255, 255, 1.0) 75%,
+                                    transparent 75%, transparent);
+                background-image: -ms-linear-gradient(45deg, rgba(255, 255, 255, 1.0) 25%, transparent 25%,
+                                    transparent 50%, rgba(255, 255, 255, 1.0) 50%, rgba(255, 255, 255, 1.0) 75%,
+                                    transparent 75%, transparent);
+                background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 1.0) 25%, transparent 25%,
+                                    transparent 50%, rgba(255, 255, 255, 1.0) 50%, rgba(255, 255, 255, 1.0) 75%,
+                                    transparent 75%, transparent);
+                background-image: linear-gradient(45deg, rgba(255, 255, 255, 1.0) 25%, transparent 25%,
+                                    transparent 50%, rgba(255, 255, 255, 1.0) 50%, rgba(255, 255, 255, 1.0) 75%,
+                                    transparent 75%, transparent);
+                -moz-background-size: 15px 15px;
+                -webkit-background-size: 15px 15px;
+                background-size: 15px 15px;
+            }
+
+
+            /* Sosumi */
+            #sosumi {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                margin: 1em 0;
+                width: 100%;
+                text-align: center;
+                color: #999;
+            }
+            #sosumi a {
+                color: #009aff;
+            }
+            #sosumi a:hover {
+                text-decoration: none;
+                color: #abc;
+            }
+            #sosumi,
+            #sosumi a,
+            #sosumi p,
+            #sosumi p a {
+                font-size: 10pt;
+            }
+        </style>
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+        <link rel="shortcut icon" href="favico.png" type="image/png" />
+
+        <!--Directly below: Because of the way IE8 and earlier handles unknown elements, borrowing this from Remy Sharp's concept.-->
+        <!--[if lt IE 9]>
+        <script type="text/javascript">
+            var e = ("abbr,article,aside,audio,canvas,datalist,details," +
+            "figure,footer,header,hgroup,mark,menu,meter,nav,output," +
+            "progress,section,time,video").split(',');
+            for (var i = 0; i < e.length; i++) {
+                document.createElement(e[i]);
+            }
+        </script>
+        <![endif]-->
+    </head>
+    <body class="diag_pinstripes">
+
+        <header>
+            <hgroup>
+                <h1>
+                    Login
+                </h1>
+                <h2>
+                    Or logon or sign-in or sign-on.
+                </h2>
+            </hgroup>
+        </header>
+
+        <section>
+            <form method="post" name="loginform" action="fauxthanks.html" onsubmit="return validateForm(this)" novalidate>
+                <!--this form intentionally doesn't do anything.-->
+                <fieldset>
+                    <legend>
+                        The Bouncer
+                    </legend>
+
+                    <label for="loginemail">
+                        Email
+                    </label>
+                    <input type="email" id="loginemail" placeholder="you@email.com" value="" name="loginformemail" required />
+
+                    <label for="loginpwd">
+                        Password
+                    </label>
+                    <input type="password" id="loginpwd" placeholder="sekret" name="loginformpwd" required />
+
+                    <button type="submit" id="action_login" class="active">
+                        Log in
+                    </button>
+                </fieldset>
+            </form>
+
+            <aside>
+                <p>
+                    For demo purposes only. Use as instructed. Unless instructions are absent.
+                </p>
+            </aside>
+
+        </section>
+
+        <footer id="sosumi">
+            2011. <a href="http://www.monstercyb.org/gordon/lab">Monstercyb.org</a>. A part of the <a href="http://www.ocf.berkeley.edu/~gordeon">GordeonBleu</a> network.
+        </footer>
+
+    </body>
+
+    <script type="text/javascript">
+        var GM = GM || {};
+
+        GM.Login = (function(GM) {
+
+            isPlaceholderSupported = function() {
+                var p = document.createElement('input');
+                return 'placeholder' in p;
+            },
+
+            clearPlaceholder = function() {
+                // passing in fauxPwdInput instead of "this" because IE refers to the window object
+                if (this.value === this.getAttribute('placeholder')) {
+                    if (this.getAttribute('type') != 'password') {
+                        this.value = '';
+                    }
+                }
+
+                // Password field swap: If this is a faux password input, swap with the real password field for input
+                if (hasClass(this, 'pwd')) {
+                    var fauxPwdField = this;
+                    var realPwdField = document.getElementById(this.id.split('faux')[1]);
+                    fauxPwdField.style.display = 'none';
+                    realPwdField.style.display = ''; // ideally, we might store the original value from the css rule
+                    realPwdField.focus();
+                }
+            },
+
+            resetPlaceholder = function() {
+                // Reset "value" value to "placeholder" value if blank
+                if (this.value === '') {
+                    // Password field swap: If this is a faux password input, swap with the real password field for input
+                    if (this.getAttribute('type') === 'password') {
+                        var realPwdField = this;
+                        var fauxPwdField = document.getElementById('faux' + this.id);
+                        realPwdField.style.display = 'none';
+                        fauxPwdField.style.display = '';
+                    }
+                    else {
+                        this.value = this.getAttribute('placeholder');
+                    }
+                }
+            },
+
+            validateForm = function(formToValidate) {
+                // In the interest of time, going to just target the two specific fields we have here. Will use formToValidate more generally at a later time.
+                var emailField = formToValidate.loginformemail;
+                var passwordField = formToValidate.loginformpwd;
+
+                // Clear inline warnings
+                // In the interest of time, instead of rewriting getElementsByClassName.
+                var spansInForm = formToValidate.getElementsByTagName('span');
+                var spansInFormLen = formToValidate.getElementsByTagName('span').length;
+                for (var i=0; i<spansInFormLen; i++) {
+                    if (hasClass(spansInForm[i], 'inlinewarning')) {
+                        spansInForm[i].style.display = 'none';
+                    }
+                }
+
+                // Reset input outlines
+                var formElements = formToValidate.elements;
+                var formElementsLen = formToValidate.elements.length;
+                for (var i=0; i<formElementsLen; i++) {
+                    if (hasClass(formElements[i], 'warningmode')) {
+                        removeClass(formElements[i], 'warningmode');
+                    }
+                }
+
+                if (emailField.value === '' || emailField.value === emailField.getAttribute('placeholder')) {
+                    addClass(emailField, 'warningmode');
+                    var inlinewarning = document.createElement('span');
+                    inlinewarning.className = 'inlinewarning';
+                    inlinewarning.innerHTML = 'Don\'t forget your email address!';
+                    emailField.parentNode.insertBefore(inlinewarning, emailField);
+                    emailField.focus();
+                    startNuhUh(formToValidate);
+                    return false;
+                }
+                else if (!validateEmail(emailField.value)) {
+                    addClass(emailField, 'warningmode');
+                    var inlinewarning = document.createElement('span');
+                    inlinewarning.className = 'inlinewarning';
+                    inlinewarning.innerHTML = 'Doesn\'t look like any email I\'ve ever seen!';
+                    emailField.parentNode.insertBefore(inlinewarning, emailField);
+                    emailField.focus();
+                    startNuhUh(formToValidate);
+                    return false;
+                }
+
+                if (passwordField.value === '' || passwordField.value === passwordField.getAttribute('placeholder')) {
+                    addClass(passwordField, 'warningmode');
+                    var inlinewarning = document.createElement('span');
+                    inlinewarning.className = 'inlinewarning';
+                    inlinewarning.innerHTML = 'Don\'t forget your password!';
+                    passwordField.parentNode.insertBefore(inlinewarning, passwordField);
+                    //passwordField.focus();
+                    startNuhUh(formToValidate);
+                    return false;
+                }
+
+                return true;
+            },
+
+            // Client-side email validation
+            validateEmail = function(email) {
+                if (window.RegExp) {
+                    var emailRegEx = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i; // RegEx from jQuery
+                    return emailRegEx.test(email);
+                }
+                else {
+                    if (email.indexOf('@') >= 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            },
+
+            /* Shake It Up */
+            shakeHead = function(formEl, positionsList, delay) {
+                positionsListShifted = positionsList.shift();
+                formEl.style.left = positionsListShifted + 'px';
+                if (positionsList.length > 0) {
+                    setTimeout(function() {
+                        shakeHead(formEl, positionsList, delay);
+                    },
+                    delay);
+                } else {
+                    try {
+                        formEl.style.position = 'static';
+                    } catch(e) {}
+                }
+            },
+
+            startNuhUh = function(formEl) {
+                var positionsList = [20, 40, 20, 0, -20, -40, -20, 0];
+                positionsList = positionsList.concat(positionsList.concat(positionsList));
+                formEl.style.position = 'relative';
+                shakeHead(formEl, positionsList, 10);
+            },
+
+            hasClass = function(el, cssClass) {
+                return el.className && new RegExp('(^|\\s)' + cssClass + '(\\s|$)').test(el.className);
+            },
+
+            addClass = function(el, cssClass) {
+                if (!this.hasClass(el, cssClass)) {
+                    el.className += ' ' + cssClass;
+                }
+            },
+
+            removeClass = function(el, cssClass) {
+                if (hasClass(el, cssClass)) {
+                    var reg = new RegExp('(\\s|^)' + cssClass + '(\\s|$)');
+                    el.className = el.className.replace(reg, '');
+                }
+            },
+
+            // Hybrid of addEventListener and attachEvent
+            attachEventListener = function(event, el, fn) {        
+                if (el.attachEvent) {
+                    el.attachEvent('on' + event.toLowerCase(), function(e) {
+                        var e = window.event;
+                        fn.call(el, e, e.srcElement);
+                    });
+                }
+                else if (el.addEventListener) {
+                    el.addEventListener(event, function(e) {
+                        fn.call(this, e, e.target);
+                    }, false);
+                }
+                else {
+                    el['on' + event.toLowerCase()] = fn;
+                }
+            };
+
+            return {
+                init: function() {
+
+                    // note to self: set this back to !isPlaceholderSupported
+                    if (!isPlaceholderSupported()) {
+
+                        var inputEls = document.getElementsByTagName('input');
+                        var textareaEls = document.getElementsByTagName('textarea');
+                        var inputElsNum = inputEls.length;
+                        var textareaElsNum = textareaEls.length;
+
+
+                        /* Inputs: (do the same thing for textareas, but will leave that out for now) */
+
+                        // Set custom data attribute with value from placeholder attribute
+                        for (var i=0; i<inputElsNum; i++) {
+                            var currentInputElmt = inputEls[i];
+                            var placeholderVal = currentInputElmt.getAttribute('placeholder');
+
+                            // Check: Placeholder Value
+                            // If there's a placeholder value, proceed.
+                            if (placeholderVal != null) {
+                                currentInputElmt.setAttribute('data-placeholder', placeholderVal);
+
+                                // Case: Password Fields
+                                // If it's a password field, value will be masked. So create faux password field.
+                                if (currentInputElmt.getAttribute('type') === 'password') {
+                                    var fauxPwdInput = document.createElement('input');
+                                    fauxPwdInput.setAttribute('type', 'text');
+                                    fauxPwdInput.value = placeholderVal;
+                                    fauxPwdInput.className += 'pwd';
+                                    fauxPwdInput.id = 'fauxpwdinput_' + i;
+                                    currentInputElmt.style.display = 'none';
+                                    currentInputElmt.id = 'pwdinput_' + i; // not ideal. could write getElementsByClassName.
+                                    currentInputElmt.parentNode.insertBefore(fauxPwdInput, currentInputElmt);
+
+                                    attachEventListener('focus', fauxPwdInput, clearPlaceholder);
+                                    attachEventListener('blur', fauxPwdInput, resetPlaceholder);
+                                }
+                                // Case: Value Attribute
+                                // If "value" attribute is not set, set value with placeholder's. (elseif so that we don't set value on the original password field)
+                                else if (currentInputElmt.value === '' || currentInputElmt.value === null) {
+                                    currentInputElmt.value = placeholderVal;
+                                }
+
+                                attachEventListener('focus', currentInputElmt, clearPlaceholder);
+                                attachEventListener('blur', currentInputElmt, resetPlaceholder);
+
+                            }
+                        }
+
+                    }
+
+                    /*
+                    var theloginform = document.forms.loginform;
+                    attachEventListener('submit', theloginform, function() {validateForm(theloginform)});
+                    */
+
+                    /*
+                    var actionbuttonlogin = document.getElementById('action_login');
+                    attachEventListener('click', actionbuttonlogin, function() {validateForm(theloginform)});
+                    */
+                }
+            };
+
+        })(GM);
+
+        GM.Login.init();
+    </script>
+
+    <!--Created: 2011 August 16-->
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-299058-9");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+</html>
