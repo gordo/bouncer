@@ -28,14 +28,12 @@
                 cursor: pointer;
             }
 
-            input::-webkit-input-placeholder,
-            textarea::-webkit-input-placeholder {
-                color: #ccc;
+            :-moz-placeholder {
+                color: #ccc !important;
             }
 
-            input:-moz-placeholder,
-            textarea:-moz-placeholder {
-                color: #ccc;
+            ::-webkit-input-placeholder {
+                color: #ccc !important;
             }
 
 
@@ -65,6 +63,7 @@
                 background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #525252), color-stop(0.5, #323232), color-stop(0.5, #2e2e2e), color-stop(1.0, #111));
                 background-image: -webkit-linear-gradient(center top, #525252 0pt, #323232 50%, #2e2e2e 50%, #111 100%);
                 background-image: -o-linear-gradient(#525252 0pt, #323232 50%, #2e2e2e 50%, #111 100%);
+                background-image: -ms-linear-gradient(center top, #525252 0pt, #323232 50%, #2e2e2e 50%, #111 100%);
                 background-image: linear-gradient(center top, #525252 0pt, #323232 50%, #2e2e2e 50%, #111 100%);
                 border-color: #222 #111 #000 #111;
                 -moz-box-shadow: 0 1px 0 #292929, 0 1px 0 #8e8e8e inset, 0 -1px 0 #333 inset, 1px 0 0 #515151 inset, -1px 0 0 #575757 inset;
@@ -79,6 +78,7 @@
                 background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #626262), color-stop(0.5, #424242), color-stop(0.5, #3e3e3e), color-stop(1.0, #222));
                 background-image: -webkit-linear-gradient(center top, #626262 0pt, #424242 50%, #3e3e3e 50%, #222 100%);
                 background-image: -o-linear-gradient(#626262 0pt, #424242 50%, #3e3e3e 50%, #222 100%);
+                background-image: -ms-linear-gradient(center top, #626262 0pt, #424242 50%, #3e3e3e 50%, #222 100%);
                 background-image: linear-gradient(center top, #626262 0pt, #424242 50%, #3e3e3e 50%, #222 100%);
                 border-color: #222 #111 #000 #111;
             }
@@ -222,6 +222,22 @@
                 box-shadow: 0 0 4px #ff6f55, inset 0 0 5px #bbb;
             }
 
+            section > form > fieldset > input[type="text"].pwd {
+                color: #ccc;
+            }
+
+            section > form > fieldset > input[type="text"].readyforinput,
+            section > form > fieldset > input[type="email"].readyforinput,
+            section > form > fieldset > input[type="password"].readyforinput,
+            section > form > fieldset > textarea:focus {
+                color: #999;
+            }
+
+            section > form > fieldset > input.fauxplaceholder,
+            section > form > fieldset > textarea.fauxplaceholder {
+                color: #ccc;
+            }
+
             section + aside {
                 margin-top: 0.8em;
             }
@@ -335,7 +351,7 @@
                     <label for="loginemail">
                         Email
                     </label>
-                    <input type="email" id="loginemail" placeholder="you@email.com" value="" name="loginformemail" required />
+                    <input type="email" id="loginemail" placeholder="e.g. you@email.com" value="" name="loginformemail" required />
 
                     <label for="loginpwd">
                         Password
@@ -372,18 +388,39 @@
                 return 'placeholder' in p;
             },
 
-            clearPlaceholder = function() {
+            clearPlaceholder = function(e, hasDelay) {
+                var e = e || window.event;
+                var targeted = e.target || e.srcElement;
+
                 // passing in fauxPwdInput instead of "this" because IE refers to the window object
-                if (this.value === this.getAttribute('placeholder')) {
-                    if (this.getAttribute('type') != 'password') {
-                        this.value = '';
+                if (targeted.value === targeted.getAttribute('placeholder')) {
+
+                    // for text color only
+                    removeClass(targeted, 'fauxplaceholder');
+
+                    // hold off on clearing faux placeholder until first keystroke
+                    // to do: during the first run, beyond the first keydown event, need to switch off faded text
+                    if (hasDelay) {
+                        if (hasClass(targeted, 'readyforinput')) {
+                            removeClass(targeted, 'readyforinput');
+                        }
+                        else {
+                            addClass(targeted, 'readyforinput');
+                        }
+
+                        // would be a better experience to set the cursor at the start of the faded placeholder text
+                        return false;
+                    }
+
+                    if (targeted.getAttribute('type') != 'password') {
+                        targeted.value = '';
                     }
                 }
 
                 // Password field swap: If this is a faux password input, swap with the real password field for input
-                if (hasClass(this, 'pwd')) {
-                    var fauxPwdField = this;
-                    var realPwdField = document.getElementById(this.id.split('faux')[1]);
+                if (hasClass(targeted, 'pwd')) {
+                    var fauxPwdField = targeted;
+                    var realPwdField = document.getElementById(targeted.id.split('faux')[1]);
                     fauxPwdField.style.display = 'none';
                     realPwdField.style.display = ''; // ideally, we might store the original value from the css rule
                     realPwdField.focus();
@@ -391,6 +428,8 @@
             },
 
             resetPlaceholder = function() {
+                removeClass(this, 'readyforinput');
+
                 // Reset "value" value to "placeholder" value if blank
                 if (this.value === '') {
                     // Password field swap: If this is a faux password input, swap with the real password field for input
@@ -402,17 +441,21 @@
                     }
                     else {
                         this.value = this.getAttribute('placeholder');
+                        addClass(this, 'fauxplaceholder');
                     }
+                }
+                else if (this.value === this.getAttribute('placeholder')) {
+                    addClass(this, 'fauxplaceholder');
                 }
             },
 
             validateForm = function(formToValidate) {
-                // In the interest of time, going to just target the two specific fields we have here. Will use formToValidate more generally at a later time.
+                // For now, going to just target the two specific fields we have here. Will use formToValidate more generally at a later time.
                 var emailField = formToValidate.loginformemail;
                 var passwordField = formToValidate.loginformpwd;
 
                 // Clear inline warnings
-                // In the interest of time, instead of rewriting getElementsByClassName.
+                // For now, instead of rewriting getElementsByClassName.
                 var spansInForm = formToValidate.getElementsByTagName('span');
                 var spansInFormLen = formToValidate.getElementsByTagName('span').length;
                 for (var i=0; i<spansInFormLen; i++) {
@@ -569,22 +612,31 @@
                                     var fauxPwdInput = document.createElement('input');
                                     fauxPwdInput.setAttribute('type', 'text');
                                     fauxPwdInput.value = placeholderVal;
+                                    fauxPwdInput.setAttribute('placeholder', placeholderVal);
                                     fauxPwdInput.className += 'pwd';
                                     fauxPwdInput.id = 'fauxpwdinput_' + i;
                                     currentInputElmt.style.display = 'none';
                                     currentInputElmt.id = 'pwdinput_' + i; // not ideal. could write getElementsByClassName.
                                     currentInputElmt.parentNode.insertBefore(fauxPwdInput, currentInputElmt);
 
-                                    attachEventListener('focus', fauxPwdInput, clearPlaceholder);
+                                    attachEventListener('focus', fauxPwdInput, function(e) {clearPlaceholder(e, true)});
+                                    attachEventListener('keydown', fauxPwdInput, function(e) {clearPlaceholder(e, false)});
                                     attachEventListener('blur', fauxPwdInput, resetPlaceholder);
                                 }
                                 // Case: Value Attribute
                                 // If "value" attribute is not set, set value with placeholder's. (elseif so that we don't set value on the original password field)
                                 else if (currentInputElmt.value === '' || currentInputElmt.value === null) {
                                     currentInputElmt.value = placeholderVal;
+                                    addClass(currentInputElmt, 'fauxplaceholder');
                                 }
 
-                                attachEventListener('focus', currentInputElmt, clearPlaceholder);
+                                /* Step 1: Preserve placeholder text when in focus, to retain context until first keystroke */
+                                attachEventListener('focus', currentInputElmt, function(e) {clearPlaceholder(e, true)});
+
+                                /* Step 2: Clear faux placeholder, using keydown to catch the unedited value to compare with placeholder attribute value */
+                                attachEventListener('keydown', currentInputElmt, function(e) {clearPlaceholder(e, false)});
+
+                                /* Step 3: And resuscitate if necessary */
                                 attachEventListener('blur', currentInputElmt, resetPlaceholder);
 
                             }
@@ -610,6 +662,8 @@
     </script>
 
     <!--Created: 2011 August 16-->
+    <!--Revised: 2011 October 9 (preserve placeholder text on focus, clear upon keystrokes. to do: decouple this from faux placeholder)-->
+
     <script type="text/javascript">
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));

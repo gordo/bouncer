@@ -1,1 +1,2 @@
 2011 August 16. Client-side validation with shaking oh-no-you-didn't head motion. More extensive input placeholder attribute implementation for browsers lacking support.
+2011 October 9. Fade placeholder text upon form input focus to retain context, then clear upon keystroke.
